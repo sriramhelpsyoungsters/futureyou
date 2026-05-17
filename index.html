@@ -62,7 +62,6 @@
     }
 
     .nav-brand span { color: var(--white); }
-    
     .nav-tagline {
       font-family: var(--font-body);
       font-size: 1.1rem;
@@ -70,7 +69,7 @@
       letter-spacing: 0.16em;
       text-transform: uppercase;
       position: absolute;
-      left: 50%;
+      left: 38%;
       transform: translateX(-50%);
       white-space: nowrap;
       pointer-events: none;
@@ -183,7 +182,7 @@
 
     .hero-headline {
       font-family: var(--font-display);
-      font-size: clamp(3.5rem, 7vw, 7rem);
+      font-size: clamp(4rem, 7vw, 7rem);
       line-height: 0.95;
       letter-spacing: 0.02em;
       color: var(--white);
@@ -195,7 +194,7 @@
     .hero-sub {
       font-size: clamp(1rem, 1.8vw, 1.2rem);
       color: #DED687;
-      max-width: 560px;
+      max-width: 480px;
       margin: 1.5rem 0 2.5rem;
       font-weight: 400;
       line-height: 1.7;
@@ -247,7 +246,6 @@
       position: relative;
       z-index: 2;
       animation: fadeUp 0.9s 0.2s ease both;
-      width: 100%;
     }
 
     .compound-card {
@@ -259,7 +257,6 @@
       max-width: 420px;
       position: relative;
       overflow: hidden;
-      margin: 0 auto;
     }
 
     .compound-card::before {
@@ -282,7 +279,7 @@
 
     .compound-card-amount {
       font-family: var(--font-display);
-      font-size: clamp(2.8rem, 5vw, 3.5rem);
+      font-size: 3.5rem;
       letter-spacing: 0.02em;
       color: var(--green);
       line-height: 1;
@@ -305,7 +302,6 @@
       background: rgba(255,255,255,0.03);
       border-radius: 8px;
       border: 1px solid rgba(255,255,255,0.04);
-      gap: 0.5rem;
     }
 
     .compound-row-label { font-size: 0.82rem; color: var(--muted); font-weight: 600; }
@@ -314,7 +310,6 @@
       font-family: var(--font-mono);
       font-size: 0.9rem;
       font-weight: 500;
-      white-space: nowrap;
     }
 
     .v-green { color: var(--green); }
@@ -387,8 +382,8 @@
 
     .section-title {
       font-family: var(--font-display);
-      font-size: clamp(2.2rem, 5vw, 4.5rem);
-      line-height: 1.05;
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      line-height: 1;
       letter-spacing: 0.02em;
       margin-bottom: 1rem;
     }
@@ -698,9 +693,6 @@
       border-radius: 16px;
       padding: 2rem;
       order: 2;
-      width: 100%;
-      max-width: 460px;
-      margin: 0 auto;
     }
 
     .mini-calc-title {
@@ -757,7 +749,7 @@
 
     .calc-result-amount {
       font-family: var(--font-display);
-      font-size: clamp(2.2rem, 4vw, 2.8rem);
+      font-size: 2.8rem;
       color: var(--green);
       letter-spacing: 0.02em;
       line-height: 1;
@@ -860,40 +852,30 @@
       transform: translateY(0);
     }
 
-    /* ── RESPONSIVE / MOBILE OPTIMIZATIONS ── */
-    @media (max-width: 1024px) {
-      .nav-tagline { display: none; } /* Clear middle ground space to allow links to fit safely */
-    }
-
+    /* ── RESPONSIVE ── */
     @media (max-width: 900px) {
       nav { padding: 1rem 1.5rem; }
       .nav-links { display: none; }
-      .hero { padding: 7rem 1.5rem 3rem; min-height: auto; }
-      .hero-below { grid-template-columns: 1fr; gap: 2.5rem; }
+      .hero { padding: 7rem 1.5rem 3rem; }
+      .hero-below { grid-template-columns: 1fr; }
       .hero-right { align-items: flex-start; }
       section { padding: 4rem 1.5rem; }
       .why-grid, .teaser-grid, .tools-grid { grid-template-columns: 1fr; }
-      .tools-grid { gap: 2rem; }
       .phases { grid-template-columns: 1fr; }
-      .phase { border-right: none; border-bottom: 1px solid var(--border); position: relative; padding: 2.5rem 1.5rem; }
+      .phase { border-right: none; border-bottom: 1px solid var(--border);
+      position: relative; }
       .phase:last-child { border-bottom: none; }
-      footer { grid-template-columns: 1fr; gap: 2rem; padding: 3rem 1.5rem; }
-      .why-stats { grid-template-columns: 1fr 1fr; gap: 1rem; }
+      footer { grid-template-columns: 1fr; gap: 2rem; }
+      .why-stats { grid-template-columns: 1fr 1fr; }
       .teaser-content { order: 2; }
       .mini-calc { order: 1; }
-      .trust-strip { gap: 1.5rem; padding: 1.5rem; justify-content: flex-start; }
-    }
-
-    @media (max-width: 480px) {
-      .why-stats { grid-template-columns: 1fr; } /* Completely stack stats on tiny screens */
-      .hero-buttons .btn-primary, .hero-buttons .btn-ghost { width: 100%; text-align: center; } /* Stack hero actions neatly */
-      .trust-strip { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; } /* Clean layout for key details on mobile */
-      .footer-bottom { flex-direction: column; align-items: flex-start; gap: 1rem; }
+      .trust-strip { gap: 1.5rem; }
     }
   </style>
 </head>
 <body>
 
+  <!-- NAV -->
   <nav>
     <a href="index.html" class="nav-brand">FUTURE<span>YOU</span></a>
     <span class="nav-tagline"><span class="early">Start Early</span><span class="dots">...</span><span class="happy">Retire Happy</span></span>
@@ -906,6 +888,7 @@
     </ul>
   </nav>
 
+  <!-- HERO -->
   <section class="hero">
     <div class="grid-bg"></div>
     <div class="hero-left">
@@ -917,7 +900,9 @@
         BIG.
       </h1>
 
+      <!-- Image + compound card side by side -->
       <div class="hero-below">
+        <!-- Compounding journey image -->
         <div style="
           border-radius: 14px;
           overflow: hidden;
@@ -932,6 +917,7 @@
           />
         </div>
 
+        <!-- Compound card -->
         <div class="hero-right">
           <div class="compound-card">
             <div class="compound-card-label">If You Start at 25 vs 35</div>
@@ -962,7 +948,9 @@
             </div>
           </div>
         </div>
-      </div><p class="hero-sub">
+      </div><!-- /hero-below -->
+
+      <p class="hero-sub">
         The single biggest advantage you have over every older investor is <strong>time</strong>.
         Learn how to save smarter, invest wisely, and watch compounding do the heavy lifting.
       </p>
@@ -973,6 +961,7 @@
     </div>
   </section>
 
+  <!-- TRUST STRIP -->
   <div class="trust-strip">
     <div class="trust-item"><span class="trust-icon">📊</span> Free Calculators</div>
     <div class="trust-item"><span class="trust-icon">🔒</span> No Data Collected</div>
@@ -981,6 +970,7 @@
     <div class="trust-item"><span class="trust-icon">🏦</span> Covers 401k · IRA · Roth</div>
   </div>
 
+  <!-- TOOLS -->
   <section id="tools">
     <p class="section-label reveal">Your Toolkit</p>
     <h2 class="section-title reveal">THREE TOOLS.<br>ONE MISSION.</h2>
@@ -1040,6 +1030,7 @@
     </div>
   </section>
 
+  <!-- WHY NOW -->
   <section class="why-now" id="why-now">
     <div class="why-grid">
       <div>
@@ -1093,6 +1084,7 @@
     </div>
   </section>
 
+  <!-- MINI CALC TEASER -->
   <section class="teaser-section" id="teaser">
     <div class="teaser-grid">
       <div class="teaser-content">
@@ -1145,6 +1137,7 @@
     </div>
   </section>
 
+  <!-- PHASE GUIDE -->
   <section class="phase-guide" id="guide">
     <p class="section-label reveal">The Accumulation Roadmap</p>
     <h2 class="section-title reveal">SAVE WELL. INVEST WELL. MONITOR ALWAYS.</h2>
@@ -1193,6 +1186,7 @@
     </div>
   </section>
 
+  <!-- FOOTER -->
   <footer>
     <div>
       <div class="footer-brand">FUTURE YOU</div>
