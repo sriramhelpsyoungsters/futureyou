@@ -49,9 +49,26 @@
       padding: 1rem 2.5rem;
       background: rgba(5,13,26,0.9); backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
+      position: relative;
     }
     .nav-brand { font-family: var(--font-display); font-size: 1.4rem; letter-spacing: 0.08em; color: var(--green); text-decoration: none; }
     .nav-brand span { color: var(--white); }
+    .nav-tagline {
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .nav-tagline .early { color: var(--green); }
+    .nav-tagline .dots  { color: var(--green); }
+    .nav-tagline .happy { color: var(--white); }
     .nav-links { display: flex; gap: 2rem; list-style: none; }
     .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; }
     .nav-links a:hover { color: var(--green); }
@@ -106,6 +123,7 @@
       text-transform: uppercase; color: var(--green);
       margin-bottom: 1rem; padding-bottom: 0.5rem;
       border-bottom: 1px solid var(--border);
+      position: relative;
       display: flex; align-items: center; gap: 0.4rem;
     }
 
@@ -290,6 +308,7 @@
 <!-- NAV -->
 <nav>
   <a href="index.html" class="nav-brand">FUTURE<span>YOU</span></a>
+    <span class="nav-tagline"><span class="early">Start Early</span><span class="dots">...</span><span class="happy">Retire Happy</span></span>
   <ul class="nav-links">
     <li><a href="401k.html">401(k)</a></li>
     <li><a href="portfolio.html">Portfolio</a></li>
@@ -429,9 +448,9 @@
         <div class="stat-sub" id="r-nest-sub">at retirement</div>
       </div>
       <div class="stat-card">
-        <div class="stat-label">Target Needed</div>
+        <div class="stat-label">Portfolio Target Needed</div>
         <div class="stat-value v-amber" id="r-target">$0</div>
-        <div class="stat-sub">to fund retirement fully</div>
+        <div class="stat-sub" id="r-target-sub">to fund retirement fully</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Surplus / Shortfall</div>
@@ -441,7 +460,7 @@
       <div class="stat-card">
         <div class="stat-label">Monthly Income at Ret.</div>
         <div class="stat-value v-sky" id="r-monthly">$0</div>
-        <div class="stat-sub">portfolio + SS combined</div>
+        <div class="stat-sub" id="r-monthly-sub">portfolio + SS combined</div>
       </div>
     </div>
 
@@ -481,7 +500,7 @@
             <span><span class="legend-dot" style="background:var(--sky)"></span>Real Value</span>
           </div>
         </div>
-        <canvas id="projChart" height="300"></canvas>
+        <canvas id="projChart" height="200"></canvas>
       </div>
       <div class="chart-wrap">
         <div class="chart-title">
@@ -491,7 +510,7 @@
             <span><span class="legend-dot" style="background:var(--green)"></span>Investment Growth</span>
           </div>
         </div>
-        <canvas id="contribChart" height="180"></canvas>
+        <canvas id="contribChart" height="140"></canvas>
       </div>
     </div>
 
@@ -508,7 +527,7 @@
           Lifetime SS Benefit by Claim Age
           <div class="chart-legend"><span><span class="legend-dot" style="background:var(--green)"></span>Cumulative Benefit</span></div>
         </div>
-        <canvas id="ssChart" height="240"></canvas>
+        <canvas id="ssChart" height="160"></canvas>
       </div>
       <div class="chart-wrap" style="background:rgba(255,255,255,0.01);border-color:var(--border);">
         <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--green);margin-bottom:0.75rem;">SS Strategy Rules of Thumb</div>
@@ -541,7 +560,7 @@
             <span><span class="legend-dot" style="background:var(--violet)"></span>SS Income (cumulative)</span>
           </div>
         </div>
-        <canvas id="drawdownChart" height="260"></canvas>
+        <canvas id="drawdownChart" height="180"></canvas>
       </div>
     </div>
 
@@ -821,28 +840,51 @@ function compute() {
   const accRows = projectAccumulation();
   if (!accRows.length) return;
 
-  const finalRow    = accRows[accRows.length - 1];
-  const nestEgg     = finalRow.bal;
-  const retSal      = finalRow.sal;
-  const wdRate      = S.wd === '4pct' ? 0.04 : 0.03;
-  const annualNeed  = retSal * S.rep / 100;
-  const ssMonthly   = ssAdjustedBenefit(S.ssClaim);
-  const ssAnnual    = ssMonthly * 12;
+  const finalRow = accRows[accRows.length - 1];
+  const years    = Math.max(1, S.ret - S.age);
+
+  // ── Key values ──────────────────────────────────────────────────
+  // nestEgg: portfolio balance at retirement
+  const nestEgg = finalRow.bal;
+
+  // retSal: salary at retirement (grown annually by sg%)
+  // NOTE: finalRow.sal is the salary DURING the last working year
+  const retSal  = finalRow.sal;
+
+  // annualNeed: income required in retirement (today's salary grown to retirement × replacement%)
+  const annualNeed = retSal * S.rep / 100;
+
+  // SS: monthly benefit adjusted for claim age, annualised
+  const ssMonthly = ssAdjustedBenefit(S.ssClaim);
+  const ssAnnual  = ssMonthly * 12;
+
+  // portfolioIncome: what the portfolio generates each year at chosen withdrawal rate
+  const wdRate = S.wd === '4pct' ? 0.04 : 0.03;
   const portfolioIncome = nestEgg * wdRate;
+
+  // totalMonthly: combined monthly income (portfolio + SS) at retirement start
   const totalMonthly = (portfolioIncome + ssAnnual) / 12;
-  const targetNeeded = (annualNeed - ssAnnual) / Math.max(wdRate, 0.001);
-  const gap = nestEgg - targetNeeded;
-  const years = Math.max(1, S.ret - S.age);
+
+  // targetNeeded: how large the portfolio must be so that
+  //   (nestEgg × wdRate) + ssAnnual = annualNeed
+  //   => nestEgg needed = (annualNeed - ssAnnual) / wdRate
+  // If SS covers all needs, target is 0 (clamped to 0)
+  const portfolioNeeded = Math.max(0, (annualNeed - ssAnnual) / Math.max(wdRate, 0.001));
+
+  // gap: positive = surplus, negative = shortfall
+  const gap = nestEgg - portfolioNeeded;
+
+  // Inflation-adjusted real value
   const inflFactor = Math.pow(1 + S.inf / 100, years);
 
-  // On track badge
-  const badgeEl = document.getElementById('on-track-badge');
-  const pctOfTarget = nestEgg / Math.max(targetNeeded, 1);
-  if (pctOfTarget >= 0.95) {
+  // ── On-track badge ───────────────────────────────────────────────
+  const badgeEl    = document.getElementById('on-track-badge');
+  const pctOfGoal  = portfolioNeeded > 0 ? nestEgg / portfolioNeeded : 1;
+  if (pctOfGoal >= 0.95) {
     badgeEl.className = 'on-track-badge';
     document.getElementById('otb-icon').textContent = '✅';
     document.getElementById('otb-text').textContent = 'ON TRACK';
-  } else if (pctOfTarget >= 0.75) {
+  } else if (pctOfGoal >= 0.75) {
     badgeEl.className = 'on-track-badge warn';
     document.getElementById('otb-icon').textContent = '⚠️';
     document.getElementById('otb-text').textContent = 'CLOSE';
@@ -852,40 +894,51 @@ function compute() {
     document.getElementById('otb-text').textContent = 'BEHIND';
   }
 
-  // Summary cards
-  animNum('r-nest',    nestEgg);
-  animNum('r-target',  Math.max(0, targetNeeded));
-  animNum('r-monthly', totalMonthly);
+  // ── Summary cards ────────────────────────────────────────────────
+  // Card 1: Projected Nest Egg
+  animNum('r-nest', nestEgg);
+  document.getElementById('r-nest-sub').textContent =
+    `at age ${S.ret} · real value ${fmt(nestEgg / inflFactor)}`;
+
+  // Card 2: Portfolio Target Needed
+  animNum('r-target', portfolioNeeded);
+  document.getElementById('r-target-sub').textContent =
+    `for ${S.rep}% income @ ${wdRate*100}% SWR · after SS`;
+
+  // Card 3: Surplus / Shortfall
   animNumSigned('r-gap', gap);
   document.getElementById('r-gap').className = 'stat-value ' + (gap >= 0 ? 'v-green' : 'v-coral');
-  document.getElementById('r-gap-sub').textContent = gap >= 0 ? 'surplus at retirement' : 'shortfall — adjust inputs';
+  document.getElementById('r-gap-sub').textContent = gap >= 0
+    ? 'portfolio surplus at retirement'
+    : 'portfolio shortfall — raise savings rate';
 
-  // Savings rate gauge
-  const sr = S.sr;
+  // Card 4: Monthly Income
+  animNum('r-monthly', totalMonthly);
+  document.getElementById('r-monthly-sub').textContent =
+    `${fmt(portfolioIncome/12)}/mo portfolio + ${fmt(ssMonthly)}/mo SS`;
+
+  // ── Savings rate gauge ───────────────────────────────────────────
+  const sr    = S.sr;
   const srPct = Math.min(100, sr / 50 * 100);
   const srFill = document.getElementById('sr-fill');
-  srFill.style.width = srPct + '%';
+  srFill.style.width      = srPct + '%';
   srFill.style.background = sr >= 20 ? '#00e676' : sr >= 15 ? '#ffab00' : '#ff6b6b';
-  document.getElementById('sr-big').textContent = sr + '%';
-  document.getElementById('sr-big').style.color = sr >= 20 ? 'var(--green)' : sr >= 15 ? 'var(--amber)' : 'var(--coral)';
+  document.getElementById('sr-big').textContent  = sr + '%';
+  document.getElementById('sr-big').style.color  =
+    sr >= 20 ? 'var(--green)' : sr >= 15 ? 'var(--amber)' : 'var(--coral)';
   document.getElementById('sr-verdict').textContent =
-    sr >= 25 ? '🔥 Excellent — you are on the fast track to retirement' :
+    sr >= 25 ? '🔥 Excellent — you are on the fast track to early retirement' :
     sr >= 20 ? '✅ Strong — well above the recommended 15% threshold' :
-    sr >= 15 ? '⚠️ Good — right at the recommended minimum, consider pushing higher' :
-    sr >= 10 ? '⚠️ Moderate — aim to reach 15%+ by increasing 1–2% per raise' :
-               '🔴 Low — under 10% makes it very hard to retire on schedule';
+    sr >= 15 ? '⚠️ Good — at the minimum; push higher with every raise' :
+    sr >= 10 ? '⚠️ Moderate — aim for 15% by increasing 1–2% per raise' :
+               '🔴 Low — under 10% makes retiring on schedule very difficult';
   document.getElementById('sr-verdict').style.color =
     sr >= 20 ? 'var(--green)' : sr >= 15 ? 'var(--amber)' : 'var(--coral)';
 
-  // ── PROJECTION CHART ──
-  const labels = accRows.map(r => r.age);
-  const realVals = accRows.map((r,i) => r.bal / Math.pow(1+S.inf/100, i+1));
-
-  // Build linear target path (what you need to accumulate each year to hit targetNeeded)
-  const targetPath = accRows.map((r,i) => {
-    const frac = (i+1) / years;
-    return targetNeeded * Math.pow(frac, 1.5); // accelerating curve
-  });
+  // ── Projection charts ────────────────────────────────────────────
+  const labels     = accRows.map(r => 'Age ' + r.age);
+  const realVals   = accRows.map((r, i) => r.bal / Math.pow(1 + S.inf / 100, i + 1));
+  const targetPath = accRows.map((_, i) => portfolioNeeded * Math.pow((i + 1) / years, 1.5));
 
   projChart.data.labels = labels;
   projChart.data.datasets[0].data = accRows.map(r => r.bal);
@@ -898,18 +951,18 @@ function compute() {
   contribChart.data.datasets[1].data = accRows.map(r => r.yearGrowth);
   contribChart.update();
 
-  // ── MILESTONES ──
+  // ── Milestones ───────────────────────────────────────────────────
   renderMilestones(accRows, nestEgg, retSal, inflFactor);
 
-  // ── SOCIAL SECURITY ──
+  // ── Social Security ──────────────────────────────────────────────
   renderSS();
 
-  // ── INCOME BRIDGE ──
+  // ── Income Bridge & Drawdown ─────────────────────────────────────
   const ddRows = projectDrawdown(nestEgg, retSal);
   renderBridge(nestEgg, retSal, ssMonthly, ssAnnual, portfolioIncome, annualNeed, ddRows);
 
-  // ── CHECKLIST ──
-  renderChecklist(sr, nestEgg, targetNeeded, gap, ssAnnual);
+  // ── Checklist ────────────────────────────────────────────────────
+  renderChecklist(sr, nestEgg, portfolioNeeded, gap, ssAnnual);
 }
 
 // ══════════════════════════════════════════════

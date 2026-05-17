@@ -49,9 +49,26 @@
       padding: 1rem 2.5rem;
       background: rgba(5,13,26,0.9); backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
+      position: relative;
     }
     .nav-brand { font-family: var(--font-display); font-size: 1.4rem; letter-spacing: 0.08em; color: var(--green); text-decoration: none; }
     .nav-brand span { color: var(--white); }
+    .nav-tagline {
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .nav-tagline .early { color: var(--green); }
+    .nav-tagline .dots  { color: var(--green); }
+    .nav-tagline .happy { color: var(--white); }
     .nav-links { display: flex; gap: 2rem; list-style: none; }
     .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; transition: color 0.2s; }
     .nav-links a:hover, .nav-links a.active { color: var(--green); }
@@ -168,6 +185,7 @@
     .section-head {
       font-size: 0.7rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase;
       color: var(--green); padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);
+      position: relative;
       margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center;
     }
     .sum-pct { font-family: var(--font-mono); font-size: 0.82rem; }
@@ -308,7 +326,7 @@
     .rule-title { font-size: 0.88rem; font-weight: 700; margin-bottom: 0.2rem; }
     .rule-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.5; }
 
-    .fund-picks-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.75rem; }
+    .fund-picks-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
     .fund-pick-card {
       background: rgba(255,255,255,0.02); border: 1px solid var(--border-dim);
       border-radius: 10px; padding: 1rem;
@@ -364,6 +382,7 @@
 <!-- NAV -->
 <nav>
   <a href="index.html" class="nav-brand">FUTURE<span>YOU</span></a>
+    <span class="nav-tagline"><span class="early">Start Early</span><span class="dots">...</span><span class="happy">Retire Happy</span></span>
   <ul class="nav-links">
     <li><a href="401k.html">401(k)</a></li>
     <li><a href="portfolio.html" class="active">Portfolio</a></li>
@@ -437,10 +456,9 @@
 
         <div id="asset-sliders"></div>
 
-        <!-- Fund picker -->
-        <div class="fund-section">
-          <div class="section-head">Pick Your Funds <span style="color:var(--muted);font-size:0.65rem;font-weight:600;text-transform:none;letter-spacing:0">Select one per category</span></div>
-          <div id="fund-picker"></div>
+        <div style="margin-top:1.5rem;">
+          <div class="info-tip" style="margin-bottom:1rem;">Sliders go up to 80% per asset. Adjust until total = 100%. The donut and metrics update live.</div>
+          <button class="btn-proceed" style="width:100%;" onclick="goStep(2)">Generate My Plan →</button>
         </div>
 
       </div>
@@ -476,7 +494,7 @@
           </div>
         </div>
 
-        <button class="btn-proceed" onclick="goStep(2)">Generate My Plan →</button>
+        <button class="btn-proceed" onclick="goStep(2)" style="margin-top:1.25rem;">Lock In Allocation →</button>
       </div>
     </div>
   </div>
@@ -485,15 +503,17 @@
   <div class="step-view" id="step-2">
     <div class="plan-wrap">
 
+      <!-- Header -->
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;gap:0.75rem;">
         <div>
           <div class="page-label">Your Personalized Portfolio Plan</div>
-          <h2 class="page-title" style="font-size:2.5rem;" id="plan-title">AGGRESSIVE GROWTH PORTFOLIO</h2>
+          <h2 class="page-title" style="font-size:2.5rem;" id="plan-title">GROWTH PORTFOLIO</h2>
         </div>
         <button class="btn-restart" onclick="goStep(1)">← Edit Allocation</button>
       </div>
 
-      <div class="plan-hero-grid">
+      <!-- ── SECTION 1: Profile Stats ── -->
+      <div class="plan-hero-grid" style="margin-bottom:1.5rem;">
         <div class="plan-stat accent">
           <div class="plan-stat-label">Equity Exposure</div>
           <div class="plan-stat-val v-green" id="ps-equity">0%</div>
@@ -507,12 +527,12 @@
           <div class="plan-stat-val v-sky" id="ps-return">0%</div>
         </div>
         <div class="plan-stat">
-          <div class="plan-stat-label">Expected Volatility</div>
+          <div class="plan-stat-label">Volatility Level</div>
           <div class="plan-stat-val v-violet" id="ps-vol">—</div>
         </div>
         <div class="plan-stat">
           <div class="plan-stat-label">Avg Expense Ratio</div>
-          <div class="plan-stat-val" id="ps-er">—</div>
+          <div class="plan-stat-val" id="ps-er">~0.05%</div>
         </div>
         <div class="plan-stat">
           <div class="plan-stat-label">Rebalance Frequency</div>
@@ -520,42 +540,155 @@
         </div>
       </div>
 
-      <div class="plan-cols">
-
-        <!-- Allocation breakdown -->
+      <!-- ── SECTION 2: Allocation + Glide Path ── -->
+      <div class="plan-cols" style="margin-bottom:1.5rem;">
         <div class="plan-card">
-          <div class="plan-card-head"><div class="plan-card-title">ALLOCATION BREAKDOWN</div></div>
+          <div class="plan-card-head"><div class="plan-card-title">TARGET ALLOCATION</div></div>
           <div class="plan-card-body">
             <div class="allocation-list" id="plan-alloc-list"></div>
           </div>
         </div>
-
-        <!-- Core rules -->
         <div class="plan-card">
-          <div class="plan-card-head"><div class="plan-card-title">MANAGING YOUR PORTFOLIO</div></div>
+          <div class="plan-card-head"><div class="plan-card-title">GLIDE PATH — HOW TO SHIFT AS YOU AGE</div></div>
+          <div class="glide-path" id="plan-glide"></div>
+        </div>
+      </div>
+
+      <!-- ── SECTION 3: Recommended Index Funds ── -->
+      <div class="plan-card" style="margin-bottom:1.5rem;">
+        <div class="plan-card-head">
+          <div class="plan-card-title">RECOMMENDED INDEX FUNDS</div>
+          <div style="font-size:0.78rem;color:var(--muted);margin-top:0.25rem;">Low-cost, broad-market index funds — not individual stocks. These are illustrative examples, not advice.</div>
+        </div>
+        <div class="plan-card-body">
+          <div class="fund-picks-grid" id="plan-funds"></div>
+        </div>
+      </div>
+
+      <!-- ── SECTION 4: My Holdings Tracker ── -->
+      <div class="plan-card" style="margin-bottom:1.5rem;">
+        <div class="plan-card-head">
+          <div class="plan-card-title">MY HOLDINGS TRACKER</div>
+          <div style="font-size:0.78rem;color:var(--muted);margin-top:0.25rem;">Fill in your actual holdings below. Use this as your reference sheet for rebalancing reviews.</div>
+        </div>
+        <div class="plan-card-body" style="padding:0;">
+          <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+              <thead>
+                <tr style="background:rgba(0,230,118,0.06);">
+                  <th style="padding:0.75rem 1rem;text-align:left;font-size:0.68rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--green);border-bottom:1px solid var(--border-dim);">Account</th>
+                  <th style="padding:0.75rem 1rem;text-align:left;font-size:0.68rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--green);border-bottom:1px solid var(--border-dim);">Ticker</th>
+                  <th style="padding:0.75rem 1rem;text-align:left;font-size:0.68rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--green);border-bottom:1px solid var(--border-dim);">Asset Class</th>
+                  <th style="padding:0.75rem 1rem;text-align:right;font-size:0.68rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--green);border-bottom:1px solid var(--border-dim);">Shares / Units</th>
+                  <th style="padding:0.75rem 1rem;text-align:right;font-size:0.68rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--green);border-bottom:1px solid var(--border-dim);">Cost Basis ($)</th>
+                  <th style="padding:0.75rem 1rem;text-align:right;font-size:0.68rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--green);border-bottom:1px solid var(--border-dim);">Current Value ($)</th>
+                  <th style="padding:0.75rem 1rem;text-align:right;font-size:0.68rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--green);border-bottom:1px solid var(--border-dim);">% of Portfolio</th>
+                </tr>
+              </thead>
+              <tbody id="holdings-tbody"></tbody>
+            </table>
+          </div>
+          <div style="padding:1rem 1.25rem;border-top:1px solid var(--border-dim);font-size:0.75rem;color:var(--muted);">💡 Track this annually. Your target allocation appears above — compare actual % vs target to find what needs rebalancing.</div>
+        </div>
+      </div>
+
+      <!-- ── SECTION 5: Account Summary ── -->
+      <div class="plan-card" style="margin-bottom:1.5rem;">
+        <div class="plan-card-head">
+          <div class="plan-card-title">ACCOUNT SUMMARY</div>
+          <div style="font-size:0.78rem;color:var(--muted);margin-top:0.25rem;">Track each account separately. Different accounts have different tax treatments.</div>
+        </div>
+        <div class="plan-card-body" style="padding:0;">
+          <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+              <thead>
+                <tr style="background:rgba(0,230,118,0.06);">
+                  <th style="padding:0.75rem 1rem;text-align:left;font-size:0.68rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--amber);border-bottom:1px solid var(--border-dim);">Account Type</th>
+                  <th style="padding:0.75rem 1rem;text-align:left;font-size:0.68rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--amber);border-bottom:1px solid var(--border-dim);">Institution</th>
+                  <th style="padding:0.75rem 1rem;text-align:right;font-size:0.68rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--amber);border-bottom:1px solid var(--border-dim);">2025 Contribution Limit</th>
+                  <th style="padding:0.75rem 1rem;text-align:right;font-size:0.68rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--amber);border-bottom:1px solid var(--border-dim);">My Contribution (YTD)</th>
+                  <th style="padding:0.75rem 1rem;text-align:right;font-size:0.68rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--amber);border-bottom:1px solid var(--border-dim);">Balance</th>
+                  <th style="padding:0.75rem 1rem;text-align:left;font-size:0.68rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--amber);border-bottom:1px solid var(--border-dim);">Tax Treatment</th>
+                </tr>
+              </thead>
+              <tbody id="accounts-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECTION 6: Rebalancing Log ── -->
+      <div class="plan-cols" style="margin-bottom:1.5rem;">
+        <div class="plan-card">
+          <div class="plan-card-head"><div class="plan-card-title">REBALANCING LOG</div></div>
+          <div class="plan-card-body" style="padding:0;">
+            <table style="width:100%;border-collapse:collapse;font-size:0.82rem;">
+              <thead>
+                <tr style="background:rgba(255,171,0,0.06);">
+                  <th style="padding:0.65rem 1rem;text-align:left;font-size:0.68rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--amber);border-bottom:1px solid var(--border-dim);">Date</th>
+                  <th style="padding:0.65rem 1rem;text-align:left;font-size:0.68rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--amber);border-bottom:1px solid var(--border-dim);">Action Taken</th>
+                  <th style="padding:0.65rem 1rem;text-align:left;font-size:0.68rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--amber);border-bottom:1px solid var(--border-dim);">Notes</th>
+                </tr>
+              </thead>
+              <tbody id="rebalance-tbody"></tbody>
+            </table>
+            <div style="padding:0.75rem 1rem;font-size:0.75rem;color:var(--muted);border-top:1px solid var(--border-dim);">Log each rebalancing event. Aim for once a year at minimum.</div>
+          </div>
+        </div>
+        <div class="plan-card">
+          <div class="plan-card-head"><div class="plan-card-title">PORTFOLIO MANAGEMENT RULES</div></div>
           <div class="plan-card-body">
             <div class="rules-list" id="plan-rules"></div>
           </div>
         </div>
+      </div>
 
-        <!-- Glide path -->
-        <div class="plan-card">
-          <div class="plan-card-head"><div class="plan-card-title">GLIDE PATH — AS YOU AGE</div></div>
-          <div class="glide-path" id="plan-glide"></div>
+      <!-- ── SECTION 7: My Action Plan ── -->
+      <div class="plan-card" style="margin-bottom:1.5rem;">
+        <div class="plan-card-head">
+          <div class="plan-card-title">MY ACTION PLAN — NEXT STEPS</div>
+          <div style="font-size:0.78rem;color:var(--muted);margin-top:0.25rem;">Use this checklist to get your portfolio set up. Check each item off as you complete it.</div>
         </div>
+        <div class="plan-card-body">
+          <div id="action-plan-list"></div>
+        </div>
+      </div>
 
-        <!-- Fund picks -->
-        <div class="plan-card">
-          <div class="plan-card-head"><div class="plan-card-title">YOUR FUND PICKS</div></div>
-          <div class="plan-card-body">
-            <div class="fund-picks-grid" id="plan-funds"></div>
+      <!-- ── SECTION 8: My Notes ── -->
+      <div class="plan-card" style="margin-bottom:2rem;">
+        <div class="plan-card-head"><div class="plan-card-title">MY NOTES & INVESTMENT JOURNAL</div></div>
+        <div class="plan-card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div>
+              <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--green);margin-bottom:0.5rem;">Why I'm Investing</div>
+              <div style="background:rgba(255,255,255,0.02);border:1px solid var(--border-dim);border-radius:8px;padding:1rem;min-height:80px;font-size:0.82rem;color:var(--muted);line-height:1.6;">
+                [Write your investment purpose here — e.g. retire at 60, fund kids' education, financial independence]
+              </div>
+            </div>
+            <div>
+              <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--amber);margin-bottom:0.5rem;">My Risk Guardrails</div>
+              <div style="background:rgba(255,255,255,0.02);border:1px solid var(--border-dim);border-radius:8px;padding:1rem;min-height:80px;font-size:0.82rem;color:var(--muted);line-height:1.6;">
+                [Write your personal rules — e.g. never sell during a crash, max 80% stocks until 40]
+              </div>
+            </div>
+            <div>
+              <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--sky);margin-bottom:0.5rem;">Last Reviewed</div>
+              <div style="background:rgba(255,255,255,0.02);border:1px solid var(--border-dim);border-radius:8px;padding:1rem;min-height:80px;font-size:0.82rem;color:var(--muted);line-height:1.6;">
+                [Date of last portfolio review and any changes made]
+              </div>
+            </div>
+            <div>
+              <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--violet);margin-bottom:0.5rem;">Next Review Scheduled</div>
+              <div style="background:rgba(255,255,255,0.02);border:1px solid var(--border-dim);border-radius:8px;padding:1rem;min-height:80px;font-size:0.82rem;color:var(--muted);line-height:1.6;">
+                [Schedule your next annual review — e.g. January 15, 2026]
+              </div>
+            </div>
           </div>
         </div>
-
       </div>
 
       <div style="text-align:center;">
-        <a href="projection.html" style="display:inline-block;background:var(--green);color:var(--navy);font-family:var(--font-body);font-weight:900;font-size:0.95rem;padding:0.9rem 2.5rem;border-radius:8px;text-decoration:none;letter-spacing:0.05em;transition:all 0.2s;">
+        <a href="projection.html" style="display:inline-block;background:var(--green);color:var(--navy);font-family:var(--font-body);font-weight:900;font-size:0.95rem;padding:0.9rem 2.5rem;border-radius:8px;text-decoration:none;letter-spacing:0.05em;">
           Next: Run Retirement Projector →
         </a>
       </div>
@@ -606,8 +739,8 @@ const QUESTIONS = [
     text: "Which outcome would bother you more?",
     options: [
       { label: "Missing big gains by being too conservative", score: 5 },
-      { label: "Both bother me equally",                      score: 3 },
       { label: "Losing significant money in a downturn",      score: 1 },
+      { label: "Both bother me equally",                      score: 3 },
     ]
   },
   {
@@ -811,9 +944,6 @@ function renderBuilder() {
       <div class="asset-detail">${ASSET_TIPS[asset]}</div>
     </div>`).join('');
 
-  // Fund picker
-  renderFundPicker();
-
   // Donut
   if (donutChart) donutChart.destroy();
   donutChart = new Chart(document.getElementById('donut-chart').getContext('2d'), {
@@ -886,29 +1016,6 @@ function updateRightPanel() {
     <div class="metric-row"><span class="metric-key">Est. Dividend Income</span><span class="metric-val v-peach">${(divInc*100).toFixed(2)}%</span></div>`;
 }
 
-function renderFundPicker() {
-  const container = document.getElementById('fund-picker');
-  container.innerHTML = Object.keys(FUNDS_DB).map(cat => `
-    <div class="fund-cat-label" style="margin-top:1.25rem; color:${ASSET_SLIDER_COLORS[cat]}">${cat}</div>
-    <div class="fund-grid">
-      ${FUNDS_DB[cat].map(f => `
-        <div class="fund-card ${selectedFunds[cat]===f.ticker?'selected':''}" onclick="selectFund('${cat}','${f.ticker}',this)">
-          <div class="fund-check">✓</div>
-          <div class="fund-ticker">${f.ticker}</div>
-          <div class="fund-name">${f.name}</div>
-          <div class="fund-expense">Expense ratio: ${f.er}</div>
-        </div>`).join('')}
-    </div>`).join('');
-}
-
-function selectFund(cat, ticker, el) {
-  selectedFunds[cat] = ticker;
-  document.querySelectorAll(`.fund-card`).forEach(c => {
-    if (c.closest('.fund-grid') === el.closest('.fund-grid')) c.classList.remove('selected');
-  });
-  el.classList.add('selected');
-}
-
 // ═══════════════════════════════════════
 // PLAN
 // ═══════════════════════════════════════
@@ -916,24 +1023,21 @@ function renderPlan() {
   const total  = Object.values(allocation).reduce((a,b)=>a+b,0);
   const equity = (allocation['US Stocks']||0) + (allocation['Intl Stocks']||0);
   const bonds  = allocation['Bonds']||0;
-  const expRet = (equity*0.08 + bonds*0.04 + (allocation['REITs']||0)*0.07 + (allocation['Cash/Stable']||0)*0.025) / Math.max(total,1);
+  const reits  = allocation['REITs']||0;
+  const cash   = allocation['Cash/Stable']||0;
+  const expRet = (equity*0.08 + bonds*0.04 + reits*0.07 + cash*0.025) / Math.max(total,1);
   const vol    = equity > 70 ? 'High' : equity > 50 ? 'Medium-High' : equity > 30 ? 'Medium' : 'Low';
+  const avgER  = '~0.05%';
 
+  // Header stats
   document.getElementById('plan-title').textContent = riskProfile.name.toUpperCase() + ' PORTFOLIO';
   document.getElementById('ps-equity').textContent  = equity + '%';
   document.getElementById('ps-bonds').textContent   = bonds + '%';
   document.getElementById('ps-return').textContent  = (expRet*100).toFixed(1) + '%';
   document.getElementById('ps-vol').textContent     = vol;
+  document.getElementById('ps-er').textContent      = avgER;
 
-  // Avg ER from selected funds
-  const erVals = Object.entries(selectedFunds).map(([cat,tk]) => {
-    const f = FUNDS_DB[cat]?.find(x=>x.ticker===tk);
-    return f ? parseFloat(f.er) : 0.05;
-  });
-  const avgER = erVals.length ? (erVals.reduce((a,b)=>a+b,0)/erVals.length).toFixed(2)+'%' : '~0.05%';
-  document.getElementById('ps-er').textContent = avgER;
-
-  // Allocation bars
+  // ── Allocation bars ──
   document.getElementById('plan-alloc-list').innerHTML = Object.keys(allocation).map(a => `
     <div class="alloc-item">
       <div class="alloc-item-top">
@@ -941,17 +1045,17 @@ function renderPlan() {
         <div class="alloc-item-pct">${allocation[a]}%</div>
       </div>
       <div class="alloc-bar-track">
-        <div class="alloc-bar-fill" style="width:${allocation[a]}%; background:${ASSET_SLIDER_COLORS[a]}; opacity:0.85"></div>
+        <div class="alloc-bar-fill" style="width:${allocation[a]}%;background:${ASSET_SLIDER_COLORS[a]};opacity:0.85"></div>
       </div>
     </div>`).join('');
 
-  // Glide path
+  // ── Glide path ──
   const glideRows = [
-    { age:'20s', stocks: equity,              bonds: bonds,              label:'Current' },
-    { age:'30s', stocks: Math.max(equity-5,0), bonds: Math.min(bonds+5,100), label:'' },
-    { age:'40s', stocks: Math.max(equity-15,0),bonds: Math.min(bonds+15,100),label:'' },
-    { age:'50s', stocks: Math.max(equity-25,0),bonds: Math.min(bonds+25,100),label:'' },
-    { age:'60s', stocks: Math.max(equity-35,0),bonds: Math.min(bonds+35,100),label:'Near Retirement' },
+    { age:'20s', stocks:equity,               bonds:bonds },
+    { age:'30s', stocks:Math.max(equity-5,0), bonds:Math.min(bonds+5,100) },
+    { age:'40s', stocks:Math.max(equity-15,0),bonds:Math.min(bonds+15,100) },
+    { age:'50s', stocks:Math.max(equity-25,0),bonds:Math.min(bonds+25,100) },
+    { age:'60s', stocks:Math.max(equity-35,0),bonds:Math.min(bonds+35,100) },
   ];
   document.getElementById('plan-glide').innerHTML =
     `<div class="glide-row header"><div>Decade</div><div>Stocks</div><div>Bonds</div></div>` +
@@ -959,22 +1063,124 @@ function renderPlan() {
       <div class="glide-row">
         <div class="glide-age">${r.age}</div>
         <div class="glide-bar-wrap">
-          <div class="mini-bar" style="width:${r.stocks*0.9}px; background:var(--green); opacity:0.8"></div>
+          <div class="mini-bar" style="width:${r.stocks*0.85}px;background:var(--green);opacity:0.8"></div>
           <span style="font-family:var(--font-mono);font-size:0.78rem;">${r.stocks}%</span>
         </div>
         <div class="glide-bar-wrap">
-          <div class="mini-bar" style="width:${r.bonds*0.9}px; background:var(--amber); opacity:0.8"></div>
+          <div class="mini-bar" style="width:${r.bonds*0.85}px;background:var(--amber);opacity:0.8"></div>
           <span style="font-family:var(--font-mono);font-size:0.78rem;">${r.bonds}%</span>
         </div>
       </div>`).join('');
 
-  // Rules
+  // ── Recommended index funds (illustrative, not stock picks) ──
+  const BEST_FUNDS = {
+    'US Stocks':   { ticker:'VTI',   name:'Vanguard Total Stock Market ETF',       er:'0.03%', why:'Total US market — 4,000+ stocks in one fund' },
+    'Intl Stocks': { ticker:'VXUS',  name:'Vanguard Total International Stock ETF',er:'0.07%', why:'Developed + emerging markets ex-US' },
+    'Bonds':       { ticker:'BND',   name:'Vanguard Total Bond Market ETF',         er:'0.03%', why:'Broad US investment-grade bond exposure' },
+    'REITs':       { ticker:'VNQ',   name:'Vanguard Real Estate ETF',              er:'0.12%', why:'US real estate, inflation hedge + income' },
+    'Cash/Stable': { ticker:'VMFXX', name:'Vanguard Federal Money Market Fund',    er:'0.11%', why:'Liquid, capital-preserving cash equivalent' },
+  };
+  const ALT_FUNDS = {
+    'US Stocks':   [
+      { ticker:'FSKAX', name:'Fidelity Total Market Index',    er:'0.015%' },
+      { ticker:'SWTSX', name:'Schwab Total Stock Market Index', er:'0.03%' },
+      { ticker:'IVV',   name:'iShares Core S&P 500 ETF',       er:'0.03%' },
+    ],
+    'Intl Stocks': [
+      { ticker:'IXUS',  name:'iShares Core MSCI Total Intl',   er:'0.07%' },
+      { ticker:'FZILX', name:'Fidelity Zero International',    er:'0.00%' },
+      { ticker:'VEA',   name:'Vanguard Developed Markets ETF', er:'0.05%' },
+    ],
+    'Bonds': [
+      { ticker:'AGG',   name:'iShares Core US Aggregate Bond', er:'0.03%' },
+      { ticker:'FXNAX', name:'Fidelity US Bond Index',         er:'0.025%' },
+      { ticker:'SCHZ',  name:'Schwab US Aggregate Bond ETF',   er:'0.03%' },
+    ],
+    'REITs': [
+      { ticker:'SCHH',  name:'Schwab US REIT ETF',             er:'0.07%' },
+      { ticker:'IYR',   name:'iShares US Real Estate ETF',     er:'0.40%' },
+    ],
+    'Cash/Stable': [
+      { ticker:'SWVXX', name:'Schwab Value Advantage Money',   er:'0.34%' },
+      { ticker:'SNSXX', name:'Schwab Treasury Obligations',    er:'0.34%' },
+    ],
+  };
+
+  document.getElementById('plan-funds').innerHTML = Object.keys(BEST_FUNDS).map(cat => {
+    const f = BEST_FUNDS[cat];
+    const alts = ALT_FUNDS[cat] || [];
+    return `
+      <div class="fund-pick-card" style="grid-column: span 1;">
+        <div class="fp-cat" style="color:${ASSET_SLIDER_COLORS[cat]}">${cat} · ${allocation[cat]}% target</div>
+        <div style="display:flex;align-items:baseline;gap:0.5rem;margin:0.35rem 0 0.15rem;">
+          <div class="fp-ticker">${f.ticker}</div>
+          <div style="font-size:0.68rem;color:var(--green);font-weight:700;">Primary Pick</div>
+        </div>
+        <div class="fp-name">${f.name}</div>
+        <div class="fp-er" style="margin-bottom:0.4rem;">ER: ${f.er} · ${f.why}</div>
+        <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.35rem;">Alternatives</div>
+        ${alts.map(a => `<div style="font-size:0.72rem;color:var(--muted);padding:0.2rem 0;border-top:1px solid rgba(255,255,255,0.04);">
+          <span style="color:var(--white);font-family:var(--font-mono);">${a.ticker}</span> — ${a.name} <span style="color:var(--muted);">(${a.er})</span>
+        </div>`).join('')}
+      </div>`;
+  }).join('');
+
+  // ── Holdings tracker rows (5 blank rows per asset class) ──
+  const holdingRows = Object.keys(allocation).flatMap(cat =>
+    Array.from({length:2}, (_,i) => `
+      <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
+        <td style="padding:0.6rem 1rem;font-size:0.8rem;color:var(--muted);">${i===0 ? cat : ''}</td>
+        <td style="padding:0.6rem 1rem;font-family:var(--font-mono);font-size:0.78rem;color:rgba(255,255,255,0.2);">——</td>
+        <td style="padding:0.6rem 1rem;font-size:0.78rem;color:${ASSET_SLIDER_COLORS[cat]};font-weight:700;">${cat}</td>
+        <td style="padding:0.6rem 1rem;text-align:right;font-family:var(--font-mono);font-size:0.78rem;color:rgba(255,255,255,0.2);">——</td>
+        <td style="padding:0.6rem 1rem;text-align:right;font-family:var(--font-mono);font-size:0.78rem;color:rgba(255,255,255,0.2);">——</td>
+        <td style="padding:0.6rem 1rem;text-align:right;font-family:var(--font-mono);font-size:0.78rem;color:rgba(255,255,255,0.2);">——</td>
+        <td style="padding:0.6rem 1rem;text-align:right;font-family:var(--font-mono);font-size:0.78rem;color:rgba(255,255,255,0.2);">—%</td>
+      </tr>`)
+  );
+  // Total row
+  holdingRows.push(`
+    <tr style="background:rgba(0,230,118,0.04);border-top:2px solid var(--border);">
+      <td colspan="5" style="padding:0.65rem 1rem;font-size:0.82rem;font-weight:700;color:var(--green);">TOTAL PORTFOLIO</td>
+      <td style="padding:0.65rem 1rem;text-align:right;font-family:var(--font-mono);font-weight:700;color:var(--green);">$——</td>
+      <td style="padding:0.65rem 1rem;text-align:right;font-family:var(--font-mono);font-weight:700;color:var(--green);">100%</td>
+    </tr>`);
+  document.getElementById('holdings-tbody').innerHTML = holdingRows.join('');
+
+  // ── Account summary rows ──
+  const ACCOUNTS = [
+    { type:'401(k) Traditional', limit:'$23,500', tax:'Pre-tax; taxed at withdrawal' },
+    { type:'401(k) Roth',        limit:'$23,500 (combined)', tax:'After-tax; tax-free growth' },
+    { type:'IRA Traditional',    limit:'$7,000',  tax:'Pre-tax; taxed at withdrawal' },
+    { type:'Roth IRA',           limit:'$7,000',  tax:'After-tax; tax-free growth' },
+    { type:'HSA',                limit:'$4,300 (self)', tax:'Triple tax advantage' },
+    { type:'Taxable Brokerage',  limit:'No limit', tax:'Capital gains rates apply' },
+  ];
+  document.getElementById('accounts-tbody').innerHTML = ACCOUNTS.map((a,i) => `
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.03);${i%2===0?'background:rgba(255,255,255,0.01);':''}">
+      <td style="padding:0.65rem 1rem;font-size:0.82rem;font-weight:700;">${a.type}</td>
+      <td style="padding:0.65rem 1rem;font-size:0.82rem;color:var(--muted);">——</td>
+      <td style="padding:0.65rem 1rem;text-align:right;font-family:var(--font-mono);font-size:0.78rem;color:var(--amber);">${a.limit}</td>
+      <td style="padding:0.65rem 1rem;text-align:right;font-family:var(--font-mono);font-size:0.78rem;color:rgba(255,255,255,0.3);">$——</td>
+      <td style="padding:0.65rem 1rem;text-align:right;font-family:var(--font-mono);font-size:0.78rem;color:rgba(255,255,255,0.3);">$——</td>
+      <td style="padding:0.65rem 1rem;font-size:0.75rem;color:var(--muted);">${a.tax}</td>
+    </tr>`).join('');
+
+  // ── Rebalancing log rows ──
+  document.getElementById('rebalance-tbody').innerHTML = Array.from({length:5}, (_,i) => `
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
+      <td style="padding:0.6rem 1rem;font-family:var(--font-mono);font-size:0.78rem;color:rgba(255,255,255,0.2);">——/——/——</td>
+      <td style="padding:0.6rem 1rem;font-size:0.78rem;color:rgba(255,255,255,0.2);">——</td>
+      <td style="padding:0.6rem 1rem;font-size:0.78rem;color:rgba(255,255,255,0.2);">——</td>
+    </tr>`).join('');
+
+  // ── Portfolio management rules ──
   const rules = [
-    { icon:'📅', title:'Rebalance Annually', desc:'Set a calendar reminder each January. Compare current vs target allocation. Redirect new contributions to underweight assets first.' },
-    { icon:'5️⃣', title:'5% Drift Rule', desc:'If any asset class drifts more than 5% from target, rebalance immediately — don\'t wait for your annual check.' },
-    { icon:'🔄', title:'Step-Down Each Decade', desc:'Reduce equity by roughly 5–10% and increase bonds every decade. Follow your glide path on the left.' },
-    { icon:'💰', title:'Expense Ratio Vigilance', desc:'Even 0.5% extra in fees costs you tens of thousands over 30 years. Stick to index funds under 0.1% where possible.' },
-    { icon:'🏦', title:'Account Location Strategy', desc:'Hold REITs & bonds in tax-advantaged accounts (401k/IRA). Keep US stocks in taxable for lower capital gains rates.' },
+    { icon:'📅', title:'Rebalance Annually', desc:'Set a calendar reminder each January. Compare current % vs target. Redirect new contributions to underweight assets first.' },
+    { icon:'5️⃣', title:'±5% Drift Rule',    desc:'If any asset drifts more than 5% from its target, rebalance immediately — don\'t wait for the annual check.' },
+    { icon:'🔄', title:'Step-Down Bonds Each Decade', desc:'Reduce equity ~5–10% and increase bonds every decade as you approach retirement. Follow the glide path.' },
+    { icon:'💰', title:'Expense Ratio Vigilance', desc:'Even 0.5% extra in fees costs tens of thousands over 30 years. Stay under 0.10% with index funds wherever possible.' },
+    { icon:'🏦', title:'Asset Location Strategy', desc:'Hold REITs & bonds in tax-advantaged accounts (401k/IRA). Hold US index funds in taxable for favorable capital gains rates.' },
   ];
   document.getElementById('plan-rules').innerHTML = rules.map(r => `
     <div class="rule-item">
@@ -982,18 +1188,25 @@ function renderPlan() {
       <div><div class="rule-title">${r.title}</div><div class="rule-desc">${r.desc}</div></div>
     </div>`).join('');
 
-  // Fund picks
-  document.getElementById('plan-funds').innerHTML = Object.keys(FUNDS_DB).map(cat => {
-    const tk = selectedFunds[cat];
-    const f  = tk ? FUNDS_DB[cat].find(x=>x.ticker===tk) : FUNDS_DB[cat][0];
-    return `
-      <div class="fund-pick-card">
-        <div class="fp-cat" style="color:${ASSET_SLIDER_COLORS[cat]}">${cat}</div>
-        <div class="fp-ticker">${f.ticker}</div>
-        <div class="fp-name">${f.name}</div>
-        <div class="fp-er">ER: ${f.er}</div>
-      </div>`;
-  }).join('');
+  // ── Action plan checklist ──
+  const actions = [
+    { done:false, label:`Open a 401(k) and contribute at least enough to get full employer match`, detail:'The match is a 50–100% instant return. Never leave it on the table.' },
+    { done:false, label:`Open a Roth IRA (if income-eligible) at Fidelity, Vanguard, or Schwab`, detail:'$7,000/year limit in 2025. Best for young earners in lower tax brackets.' },
+    { done:false, label:`Set up automatic monthly contributions to each account`, detail:'Automating removes the temptation to time the market.' },
+    { done:false, label:`Buy the recommended index funds in the proportions above`, detail:`Target: ${equity}% stocks, ${bonds}% bonds, ${reits}% REITs, ${cash}% cash.` },
+    { done:false, label:`Set a calendar reminder for your annual rebalancing review`, detail:'January is a natural time — after year-end statements arrive.' },
+    { done:false, label:`Review and update your allocation every decade`, detail:'Follow the glide path — shift bonds up as you age toward retirement.' },
+    { done:false, label:`Check expense ratios on all holdings annually`, detail:'Target under 0.10%. Small differences compound dramatically over 30 years.' },
+    { done:false, label:`Record this review date and schedule the next one`, detail:'Consistent monitoring is the key discipline of successful long-term investing.' },
+  ];
+  document.getElementById('action-plan-list').innerHTML = actions.map((a,i) => `
+    <div style="display:flex;gap:0.85rem;align-items:flex-start;padding:0.85rem 0;border-bottom:1px solid rgba(255,255,255,0.04);">
+      <div style="width:22px;height:22px;border-radius:6px;border:2px solid rgba(0,230,118,0.3);background:transparent;display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:var(--green);flex-shrink:0;margin-top:2px;">○</div>
+      <div>
+        <div style="font-size:0.88rem;font-weight:700;margin-bottom:0.2rem;">${i+1}. ${a.label}</div>
+        <div style="font-size:0.78rem;color:var(--muted);line-height:1.5;">${a.detail}</div>
+      </div>
+    </div>`).join('');
 }
 </script>
 </body>

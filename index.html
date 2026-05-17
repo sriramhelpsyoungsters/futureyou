@@ -50,6 +50,7 @@
       background: rgba(5, 13, 26, 0.85);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
+      position: relative;
     }
 
     .nav-brand {
@@ -61,6 +62,21 @@
     }
 
     .nav-brand span { color: var(--white); }
+    .nav-tagline {
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      position: absolute;
+      left: 38%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .nav-tagline .early { color: var(--green); }
+    .nav-tagline .dots  { color: var(--green); }
+    .nav-tagline .happy { color: var(--white); }
 
     .nav-links {
       display: flex;
@@ -328,6 +344,7 @@
       padding: 1.5rem 3rem;
       border-top: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
+      position: relative;
       background: rgba(255,255,255,0.01);
       flex-wrap: wrap;
     }
@@ -836,7 +853,8 @@
       section { padding: 4rem 1.5rem; }
       .why-grid, .teaser-grid, .tools-grid { grid-template-columns: 1fr; }
       .phases { grid-template-columns: 1fr; }
-      .phase { border-right: none; border-bottom: 1px solid var(--border); }
+      .phase { border-right: none; border-bottom: 1px solid var(--border);
+      position: relative; }
       .phase:last-child { border-bottom: none; }
       footer { grid-template-columns: 1fr; gap: 2rem; }
       .why-stats { grid-template-columns: 1fr 1fr; }
@@ -851,6 +869,7 @@
   <!-- NAV -->
   <nav>
     <a href="index.html" class="nav-brand">FUTURE<span>YOU</span></a>
+    <span class="nav-tagline"><span class="early">Start Early</span><span class="dots">...</span><span class="happy">Retire Happy</span></span>
     <ul class="nav-links">
       <li><a href="#tools">Tools</a></li>
       <li><a href="#why-now">Why Now</a></li>
